@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Event Submission</title>
+</head>
+
+<body>
+
+    <h1>Apex Event</h1>
+    <h2>Submission Form</h2>
+
+    <form id="submissionForm">
+
+        <label for="schoolName">School Name</label><br>
+        <input
+            type="text"
+            id="schoolName"
+            name="schoolName"
+            placeholder="Enter school name"
+            required
+        >
+        <br><br>
+
+        <label for="schoolCode">School Code</label><br>
+        <input
+            type="text"
+            id="schoolCode"
+            name="schoolCode"
+            placeholder="Enter school code"
+            required
+        >
+        <br><br>
+
+        <label for="file">Submission File</label><br>
+        <input
+            type="file"
+            id="file"
+            name="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            required
+        >
+
+        <p>Accepted: PDF, JPG, JPEG, PNG | Maximum size: 10 MB</p>
+
+        <button type="submit">Submit</button>
+
+    </form>
+
+    <p id="message"></p>
+
+    <script>
+        const form = document.getElementById("submissionForm");
+        const message = document.getElementById("message");
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const schoolName = document.getElementById("schoolName").value.trim();
+            const schoolCode = document.getElementById("schoolCode").value.trim();
+            const fileInput = document.getElementById("file");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                message.textContent = "Please select a file.";
+                return;
+            }
+
+            // 10 MB limit
+            const maxSize = 10 * 1024 * 1024;
+
+            if (file.size > maxSize) {
+                message.textContent = "File is too large. Maximum size is 10 MB.";
+                return;
+            }
+
+            const allowedTypes = [
+                "application/pdf",
+                "image/jpeg",
+                "image/png"
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+                message.textContent = "Only PDF, JPG, JPEG and PNG files are allowed.";
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append("schoolName", schoolName);
+            formData.append("schoolCode", schoolCode);
+            formData.append("file", file);
+
+            message.textContent = "Submitting...";
+
+            try {
+
+                // BACKEND URL WILL BE ADDED LATER
+                const response = await fetch("YOUR_BACKEND_URL_HERE", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Submission failed");
+                }
+
+                message.textContent = "Submission successful!";
+
+                form.reset();
+
+            } catch (error) {
+                message.textContent =
+                    "Submission failed. Please try again.";
+            }
+        });
+    </script>
+
+</body>
+</html>
